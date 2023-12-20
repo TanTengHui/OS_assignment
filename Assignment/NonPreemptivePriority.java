@@ -88,7 +88,7 @@ public class NonPreemptivePriority {
                             String.valueOf(waitingTime)
                     };
                     tableData.add(rowData);
-                    int ganttChartWidth = 5; // Example constant size for the Gantt chart
+                    int ganttChartWidth = 5; // constant size for the Gantt chart
 
                     upperLine.append("-".repeat(Math.max(0, currentProcess.burstTime))).append("-----");
                     ganttChart.append(String.format(" %-" + ganttChartWidth + "s |", currentProcess.processName));
