@@ -6,23 +6,7 @@ public class NonPreemptiveSJF {
     public NonPreemptiveSJF() {
         executeSJFScheduling();
     }
-    private static void sortProcesses(int arrivalTime[], int burstTime[], int numProcesses) {
-        for (int i = 0; i < numProcesses - 1; i++) {
-            for (int j = 0; j < numProcesses - i - 1; j++) {
-                if (arrivalTime[j] > arrivalTime[j + 1]) {
-                    // Swap arrival time
-                    int tempArrival = arrivalTime[j];
-                    arrivalTime[j] = arrivalTime[j + 1];
-                    arrivalTime[j + 1] = tempArrival;
-
-                    // Swap burst time
-                    int tempBurst = burstTime[j];
-                    burstTime[j] = burstTime[j + 1];
-                    burstTime[j + 1] = tempBurst;
-                }
-            }
-        }
-    }
+    
     private void executeSJFScheduling() {
         try (Scanner scanner = new Scanner(System.in)) {
             int numProcesses;
@@ -41,7 +25,7 @@ public class NonPreemptiveSJF {
             int[] waitingTime = new int[numProcesses];
             int[] turnaroundTime = new int[numProcesses];
             boolean[] completed = new boolean[numProcesses];
-            sortProcesses(arrivalTime, burstTime, numProcesses);
+            
             for (int i = 0; i < numProcesses; i++) {
                 System.out.println("Enter details for Process P" + i + ":");
                 System.out.print("Arrival Time: ");
@@ -113,7 +97,7 @@ public class NonPreemptiveSJF {
                 for (int j = 0; j < burstTime[i]; j++) {
                     System.out.print(" ");
                 }
-                sortProcesses(arrivalTime, burstTime, numProcesses);
+                
 
                 int finishTime = arrivalTime[i] + turnaroundTime[i];
                 System.out.print(finishTime);
