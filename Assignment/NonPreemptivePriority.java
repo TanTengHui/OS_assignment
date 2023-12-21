@@ -51,7 +51,12 @@ public class NonPreemptivePriority {
                 processes.add(new Process("P" + i, arrivalTime, burstTime, priority));
             }
 
-            processes.sort(Comparator.comparing(p -> p.processName)); // Sort processes by process name
+            processes.sort((p1, p2) -> {
+                if (p1.arrivalTime == p2.arrivalTime) {
+                    return Integer.compare(p2.priority, p1.priority); // Higher priority first
+                }
+                return Integer.compare(p1.arrivalTime, p2.arrivalTime); // Lower arrival time first
+            }); // Sort processes by process name
 
             int currentTime = 0;
             int totalTurnaroundTime = 0;
