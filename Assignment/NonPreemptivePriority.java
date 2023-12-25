@@ -16,6 +16,8 @@ class Process {
         this.burstTime = burstTime;
         this.priority = priority;
     }
+
+   
 }
 
 public class NonPreemptivePriority {
