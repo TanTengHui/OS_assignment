@@ -1,43 +1,36 @@
-import java.util.Scanner;
+import java.util.*;
+
+
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
+        Scanner input = new Scanner(System.in);
+        int type = 0;
 
-        while (!exit) {
-            System.out.println("Select an option:");
-            System.out.println("1. Non-Preemptive Shortest Job First (SJF)");
-            System.out.println("2. Preemptive Shortest Job First (SJF)");
-            System.out.println("3. Non-Preemptive Priority");
-            System.out.println("4. Round Robin");
-            System.out.println("0. Exit");
-            System.out.println();
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-
-            switch (choice) {
-                case 0:
-                    exit = true;
-                    System.out.println("Exiting the program...");
-                    break;
-                case 1:
-                    new NonPreemptiveSJF();
-                    
-                case 2:
-                    new PreemptiveSJF();
-                    
-                case 3:
-                    new NonPreemptivePriority();
-                    
-                case 4:
-                    new RoundRobin();
-                    
-                default:
-                    System.out.println("Invalid choice! Please enter a valid option.");
+        do {
+            System.out.print("Please select mode: \n" +
+                                "1. NonPreemptiveSJF\n" +
+                                "2. PreemptiveSJF\n" +
+                                "3. NonPreemptivePriority\n" +
+                                "4. RoundRobin\n\n" +
+                                "Input (0 to quit) -> ");
+            
+            try {
+                type = input.nextInt();
+            } catch (Exception e) {
+                System.out.println("\nError: Input is not an integer\n\n");
             }
-        }
 
-        scanner.close();
+            if (type == 0) System.exit(0);
+            else if (!(type == 1 || type == 2 || type ==3 || type == 4)) System.out.println("\nPlease choose the correct option\n\n");
+            else break;
+        } while (true);
+        
+        if (type == 1) new NonPreemptiveSJF();
+        else if (type == 2) new PreemptiveSJF();
+        else if (type == 3) new NonPreemptivePriority();
+        else if (type == 4) new RoundRobin();
+
+        input.close();
     }
 }
