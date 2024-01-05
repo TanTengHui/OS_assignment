@@ -4,17 +4,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-class Process {
+class Task {
     int arrivalTime;
     int burstTime;
     int completionTime;
     int turnaroundTime;
     int waitingTime;
     int startTime;
-    String processName;
+    String taskName;
 
-    public Process(String processName, int arrivalTime, int burstTime) {
-        this.processName = processName;
+    public Task(String taskName, int arrivalTime, int burstTime) {
+        this.taskName = taskName;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
         this.completionTime = 0;
@@ -22,6 +22,7 @@ class Process {
         this.waitingTime = 0;
         this.startTime = 0;
     }
+    
 }
 
 public class RoundRobin {
@@ -48,7 +49,7 @@ public class RoundRobin {
                     System.out.println("Number of processes should be between 3 and 10. Please try again.");
                 }
             }
-            Process[] p = new Process[50]; // Array of Process objects
+            Task[] t = new Task[50]; // Array of Task objects
             int[] burstArr = new int[50]; // Array to store burst times
 
             for (int i = 0; i < n; i++) {
@@ -57,31 +58,41 @@ public class RoundRobin {
                 int arrivalTime = scanner.nextInt();
                 System.out.print("Burst Time" + ": ");
                 int burstTime = scanner.nextInt();
-                p[i] = new Process("P" + i, arrivalTime, burstTime); // Creating Process objects
-                burstArr[i] = p[i].burstTime; // Storing burst times
+                t[i] = new Task("P" + i, arrivalTime, burstTime); // Creating Task objects
+                burstArr[i] = t[i].burstTime; // Storing burst times
             }
 
             Queue<Integer> q = new LinkedList<>(); // FIFO queue
             int current_time = 0;
-            q.add(0); // Add initial process (assuming ID 0)
+           // q.add(0); // Add initial task (assuming ID 0)
             int completed = 0;
-            int[] mark = new int[100]; // Array to mark completed processes
+            int[] mark = new int[100]; // Array to mark completed tasks
             Arrays.fill(mark, 0); // Initialize all elements of the array with 0
-            mark[0] = 1; // Mark the initial process as arrived
+            //mark[0] = 1; // Mark the initial task as arrived
 
             StringBuilder ganttChart = new StringBuilder("|");
             StringBuilder upperLine = new StringBuilder("-");
             StringBuilder lowerLine = new StringBuilder("-");
-            
+            boolean hasArrivedZero = false;
+            for (int i = 0; i < n; i++) {
+                if (burstArr[i] > 0 && t[i].arrivalTime == 0) {
+                    mark[i] = 1;
+                    q.add(i);
+                    hasArrivedZero = true;
+                }
+            }
 
             while (completed != n) {
-                // Give quantum unit of time to the process that is in the front
-                // of the queue and poll this process from the queue.
+                // Give quantum unit of time to the task that is in the front
+                // of the queue and poll this task from the queue.
+                 if (hasArrivedZero) {
+                    hasArrivedZero = false;
+                    continue;}
                 index = q.poll();
 
-                if (burstArr[index] == p[index].burstTime) {
-                    p[index].startTime = Math.max(current_time, p[index].arrivalTime);
-                    current_time = p[index].startTime;
+                if (burstArr[index] == t[index].burstTime) {
+                    t[index].startTime = Math.max(current_time, t[index].arrivalTime);
+                    current_time = t[index].startTime;
                 }
 
                 if (0 < burstArr[index] - tq) {
@@ -89,35 +100,35 @@ public class RoundRobin {
                     current_time += tq;
                 } else {
                     current_time += burstArr[index];
-                    p[index].completionTime = current_time;
-                    p[index].turnaroundTime = p[index].completionTime - p[index].arrivalTime;
-                    p[index].waitingTime = p[index].turnaroundTime - p[index].burstTime;
-                    TotalWaiting += p[index].waitingTime;
-                    TotalTurnaround += p[index].turnaroundTime;
+                    t[index].completionTime = current_time;
+                    t[index].turnaroundTime = t[index].completionTime - t[index].arrivalTime;
+                    t[index].waitingTime = t[index].turnaroundTime - t[index].burstTime;
+                    TotalWaiting += t[index].waitingTime;
+                    TotalTurnaround += t[index].turnaroundTime;
                     completed++;
                     burstArr[index] = 0;
                 }
 
                 // Generate Gantt Chart
                 upperLine.append("-".repeat(Math.max(0, 1))).append("------");
-                ganttChart.append(" ").append(p[index].processName).append(" |");
+                ganttChart.append(" ").append(t[index].taskName).append(" |");
                 lowerLine.append("-".repeat(Math.max(0, 1))).append("------");
                 
-                // If some process has arrived when this process was executing,
+                // If some task has arrived when this task was executing,
                 // insert them into the queue.
                 for (int i = 0; i < n; i++) {
-                    if (burstArr[i] > 0 && p[i].arrivalTime <= current_time && mark[i] == 0) {
+                    if (burstArr[i] > 0 && t[i].arrivalTime <= current_time && mark[i] == 0) {
                         mark[i] = 1;
                         q.add(i);
                     }
                 }
-                // If the current process has burst time remaining,
-                // push the process into the queue again.
+                // If the current task has burst time remaining,
+                // push the task into the queue again.
                 if (0 < burstArr[index])
                     q.add(index);
 
                 // If the queue is empty,
-                // pick the first process from the list that is not completed.
+                // pick the first task from the list that is not completed.
                 if (q.isEmpty()) {
                     for (int i = 0; i < n; i++) {
                         if (0 < burstArr[i]) {
@@ -136,7 +147,7 @@ public class RoundRobin {
             System.out.println(ganttChart);
             System.out.println(lowerLine);
             System.out.println();
-            System.out.println("\nProcess Details:");
+            System.out.println("\nTask Details:");
             System.out.println(
                     "+----------+------------------+------------------+------------------+------------------+------------------+");
             System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n", "Process", "Arrival Time",
@@ -146,8 +157,8 @@ public class RoundRobin {
             for (int i = 0; i < n; i++) {
                 System.out.printf(
                         "| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n",
-                        i, p[i].arrivalTime, p[i].burstTime, p[i].completionTime,
-                        p[i].turnaroundTime, p[i].waitingTime);
+                        t[i].taskName, t[i].arrivalTime, t[i].burstTime, t[i].completionTime,
+                        t[i].turnaroundTime, t[i].waitingTime);
             }
             System.out.println(
                     "+----------+------------------+------------------+------------------+------------------+------------------+");
