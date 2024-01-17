@@ -1,12 +1,11 @@
 import java.text.DecimalFormat;
-
 import java.util.Scanner;
 
 public class NonPreemptiveSJF {
     public NonPreemptiveSJF() {
         executeSJFScheduling();
     }
-    
+
     private void executeSJFScheduling() {
         try (Scanner scanner = new Scanner(System.in)) {
             int numProcesses;
@@ -19,13 +18,13 @@ public class NonPreemptiveSJF {
                     System.out.println("Number of processes should be between 3 and 10. Please try again.");
                 }
             }
-            
+
             int[] arrivalTime = new int[numProcesses];
             int[] burstTime = new int[numProcesses];
             int[] waitingTime = new int[numProcesses];
             int[] turnaroundTime = new int[numProcesses];
             boolean[] completed = new boolean[numProcesses];
-            
+
             for (int i = 0; i < numProcesses; i++) {
                 System.out.println("Enter details for Process P" + i + ":");
                 System.out.print("Arrival Time: ");
@@ -38,12 +37,15 @@ public class NonPreemptiveSJF {
             int currentTime = 0;
             int totalTurnaroundTime = 0;
             int totalWaitingTime = 0;
-            
+
             System.out.println("\nGantt Chart:");
-           
+
             StringBuilder ganttChart = new StringBuilder("|");
             StringBuilder upperLine = new StringBuilder("-");
             StringBuilder lowerLine = new StringBuilder("-");
+
+            // Define constant width for each time unit in the Gantt chart
+            int timeUnitWidth = 5;
 
             while (true) {
                 int shortest = -1;
@@ -71,19 +73,17 @@ public class NonPreemptiveSJF {
                         continue;
                     }
                 }
-                upperLine.append("-".repeat(Math.max(0, burstTime[shortest]))).append("------");
-                ganttChart.append("P").append(shortest).append(" ".repeat(Math.max(0, burstTime[shortest] - 1))).append("|");
-                lowerLine.append("-".repeat(Math.max(0, burstTime[shortest]))).append("------");
-                
+                upperLine.append("-".repeat(Math.max(0, timeUnitWidth))).append("------");
+                ganttChart.append("P").append(shortest).append(" ".repeat(Math.max(0, timeUnitWidth - 1))).append("|");
+                lowerLine.append("-".repeat(Math.max(0, timeUnitWidth))).append("------");
+
                 currentTime += burstTime[shortest];
 
-            
                 turnaroundTime[shortest] = currentTime - arrivalTime[shortest];
                 waitingTime[shortest] = turnaroundTime[shortest] - burstTime[shortest];
                 totalTurnaroundTime += turnaroundTime[shortest];
                 totalWaitingTime += waitingTime[shortest];
                 completed[shortest] = true;
-
             }
             int chartLength = ganttChart.length();
             upperLine.setLength(chartLength);
@@ -91,22 +91,20 @@ public class NonPreemptiveSJF {
             System.out.println(upperLine);
             System.out.println(ganttChart.toString());
             System.out.println(lowerLine);
-            
-            System.out.print("0 ");
-            for (int i = 0; i < numProcesses; i++) {
-                for (int j = 0; j < burstTime[i]; j++) {
-                    System.out.print(" ");
-                }
-                
 
-                int finishTime = arrivalTime[i] + turnaroundTime[i];
-                System.out.print(finishTime);
-            }
+           
+           
+            // System.out.print("0 ");
+            // for (int i = 0; i < numProcesses; i++) {
+            //     for (int j = 0; j < burstTime[i]; j++) {
+            //         System.out.print(" ");
+            //     }
+
+            //     int finishTime = arrivalTime[i] + turnaroundTime[i];
+            //     System.out.print(finishTime);
+            // }
 
             System.out.println();
-            
-           
-            
 
             System.out.println("\nProcess Details:");
             System.out.println(
@@ -135,13 +133,5 @@ public class NonPreemptiveSJF {
             System.out.println("Total Waiting Time: " + totalWaitingTime);
             System.out.println("Average Waiting Time: " + df.format(avgWaitingTime));
         }
-        
-    
     }
-    
-    
-      
 }
-   
-    
-
