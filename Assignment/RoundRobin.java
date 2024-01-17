@@ -115,7 +115,7 @@ public class RoundRobin {
                 lowerLine.append("-".repeat(Math.max(0, 1))).append("------");
                 
                 // If some task has arrived when this task was executing,
-                // insert them into the queue.
+                // insert them into the queue based on their arrival time.
                 for (int i = 0; i < n; i++) {
                     if (burstArr[i] > 0 && t[i].arrivalTime <= current_time && mark[i] == 0) {
                         mark[i] = 1;
@@ -124,9 +124,10 @@ public class RoundRobin {
                 }
                 // If the current task has burst time remaining,
                 // push the task into the queue again.
-                if (0 < burstArr[index])
+                if (0 < burstArr[index]){
                     q.add(index);
-
+                }
+                   
                 // If the queue is empty,
                 // pick the first task from the list that is not completed.
                 if (q.isEmpty()) {
