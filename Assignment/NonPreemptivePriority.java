@@ -125,6 +125,8 @@ public class NonPreemptivePriority {
             System.out.println("+----------+------------------+------------------+------------------+------------------+------------------+------------------+");
             System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s | %-16s |\n", "Process", "Arrival Time", "Burst Time", "Finish Time", "Priority", "Turnaround Time", "Waiting Time");
             System.out.println("+----------+------------------+------------------+------------------+------------------+------------------+------------------+");
+            tableData.sort(Comparator.comparing(row -> Integer.parseInt(row[0].substring(1))));
+
             for (String[] row : tableData) {
                 System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s | %-16s |\n", row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
             }
