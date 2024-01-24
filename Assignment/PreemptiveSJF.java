@@ -1,122 +1,147 @@
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
+class Progress {
+    int pid; // Process ID
+    int at; // Arrival Time
+    int bt; // Burst Time
+    int ct, wt, tat, start_time; // Completion Time, Waiting Time, Turn Around Time, start time
+}
+
 public class PreemptiveSJF {
-    public PreemptiveSJF(){
-        executePreemptiveSJF();
+    public PreemptiveSJF() {
+        executePSJF();
     }
-    
-    private void executePreemptiveSJF(){
-         try (Scanner scanner = new Scanner(System.in)) {
-            int numProcesses;
+
+    private void executePSJF() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            int n;
+            float[] bt_remaining;
+            boolean[] is_completed;
+
+            int current_time = 0;
+            int completed = 0;
+            float sum_tat = 0, sum_wt = 0;
+
+            int max_completion_time, min_arrival_time;
+
             while (true) {
-                System.out.print("Enter the number of processes (3-10): ");
-                numProcesses = scanner.nextInt();
-                if (numProcesses >= 3 && numProcesses <= 10) {
+                System.out.print("Enter total number of processes (3-10): ");
+                n = scanner.nextInt();
+                if (n >= 3 && n <= 10) {
                     break; // Break the loop if the input is within the valid range
                 } else {
                     System.out.println("Number of processes should be between 3 and 10. Please try again.");
                 }
             }
 
-        int[] arrivalTime = new int[numProcesses];
-        int[] burstTime = new int[numProcesses];
-        int[] remainingTime = new int[numProcesses];
-        int[] waitingTime = new int[numProcesses];
-        int[] turnaroundTime = new int[numProcesses];
-        boolean[] completed = new boolean[numProcesses];
+            Progress[] pg = new Progress[n];
+            bt_remaining = new float[n];
+            is_completed = new boolean[n];
+            for (int i = 0; i < n; i++) {
+                pg[i] = new Progress();
+                pg[i].pid = i;
+                System.out.print("\nEnter Progress " + i + " Arrival Time: ");
+                pg[i].at = scanner.nextInt();
+                System.out.print("\nEnter Progress " + i + " Burst Time: ");
+                pg[i].bt = scanner.nextInt();
+                bt_remaining[i] = pg[i].bt;
+                is_completed[i] = false;
+            }
+            // Variables for Gantt chart
+            StringBuilder ganttChart = new StringBuilder("|");
+            StringBuilder upperLine = new StringBuilder("-");
+            StringBuilder lowerLine = new StringBuilder("-");
+            int timeUnitWidth = 2; // Constant width for each time unit in the Gantt chart
+            while (completed != n) {
+                int min_index = -1;
+                int minimum = Integer.MAX_VALUE;
 
-        for (int i = 0; i < numProcesses; i++) {
-            System.out.println("Enter details for Process P" + i + ":");
-            System.out.print("Arrival Time: ");
-            arrivalTime[i] = scanner.nextInt();
-            System.out.print("Burst Time: ");
-            burstTime[i] = scanner.nextInt();
-            remainingTime[i] = burstTime[i]; // Initialize remaining time with burst time
-            completed[i] = false;
-        }
+                for (int i = 0; i < n; i++) {
+                    if (pg[i].at <= current_time && !is_completed[i]) {
+                        if (bt_remaining[i] < minimum) {
+                            minimum = (int) bt_remaining[i];
+                            min_index = i;
+                        }
+                        if (bt_remaining[i] == minimum) {
+                            if (pg[i].at < pg[min_index].at) {
+                                minimum = (int) bt_remaining[i];
+                                min_index = i;
+                            }
+                        }
+                    }
+                }
 
-        int currentTime = 0;
-        int totalTurnaroundTime = 0;
-        int totalWaitingTime = 0;
-        int completedProcesses = 0;
+                if (min_index == -1) {
+                    current_time++;
+                } else {
+                    if (bt_remaining[min_index] == pg[min_index].bt) {
+                        pg[min_index].start_time = current_time;
 
-        System.out.println("\nGantt Chart:");
-        StringBuilder ganttChart = new StringBuilder("|");
-        StringBuilder upperLine = new StringBuilder("-");
-        StringBuilder lowerLine = new StringBuilder("-");
-        while (completedProcesses < numProcesses) {
-            int shortest = -1;
-            int shortestBurst = Integer.MAX_VALUE;
+                    }
+                    upperLine.append("-".repeat(Math.max(0, timeUnitWidth))).append("------");
+                    ganttChart.append("P").append(pg[min_index].pid)
+                            .append(" ".repeat(Math.max(0, timeUnitWidth - 1))).append("|");
+                    lowerLine.append("-".repeat(Math.max(0, timeUnitWidth))).append("------");
 
-            for (int i = 0; i < numProcesses; i++) {
-                if (!completed[i] && arrivalTime[i] <= currentTime && remainingTime[i] < shortestBurst) {
-                    shortest = i;
-                    shortestBurst = remainingTime[i];
+                    bt_remaining[min_index] -= 1;
+                    current_time++;
+
+                    if (bt_remaining[min_index] == 0) {
+                        pg[min_index].ct = current_time;
+                        pg[min_index].tat = pg[min_index].ct - pg[min_index].at;
+                        pg[min_index].wt = pg[min_index].tat - pg[min_index].bt;
+
+                        sum_tat += pg[min_index].tat;
+                        sum_wt += pg[min_index].wt;
+
+                        completed++;
+                        is_completed[min_index] = true;
+                    }
                 }
             }
 
-            if (shortest == -1) {
-                currentTime++;
-                continue;
+            // Calculate Length of Process completion cycle
+            max_completion_time = Integer.MIN_VALUE;
+            min_arrival_time = Integer.MAX_VALUE;
+            for (int i = 0; i < n; i++) {
+                max_completion_time = Math.max(max_completion_time, pg[i].ct);
+                min_arrival_time = Math.min(min_arrival_time, pg[i].at);
+            }
+            int chartLength = ganttChart.length();
+            upperLine.setLength(chartLength);
+            lowerLine.setLength(chartLength);
+
+            System.out.println("\nGantt Chart:");
+            System.out.println(upperLine);
+            System.out.println(ganttChart);
+            System.out.println(lowerLine);
+
+            System.out.println("\nProcess Details:");
+            System.out.println(
+                    "+----------+------------------+------------------+------------------+------------------+------------------+");
+
+            System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n", "Process", "Arrival Time",
+                    "Burst Time", "Finish Time", "Turnaround Time", "Waiting Time");
+            System.out.println(
+                    "+----------+------------------+------------------+------------------+------------------+------------------+");
+
+            for (int i = 0; i < n; i++) {
+                System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n",
+                        "P" + pg[i].pid, pg[i].at, pg[i].bt, pg[i].ct, pg[i].tat, pg[i].wt);
             }
 
-            upperLine.append("-".repeat(Math.max(0, 1))).append("------");
-            ganttChart.append("P").append(shortest).append("|");
-            lowerLine.append("-".repeat(Math.max(0, 1))).append("------");
-            remainingTime[shortest]--;
+            System.out.println(
+                    "+----------+------------------+------------------+------------------+------------------+------------------+");
 
-            if (remainingTime[shortest] == 0) {
-                completedProcesses++;
-                int finishTime = currentTime + 1;
-                turnaroundTime[shortest] = finishTime - arrivalTime[shortest];
-                waitingTime[shortest] = turnaroundTime[shortest] - burstTime[shortest];
-                totalTurnaroundTime += turnaroundTime[shortest];
-                totalWaitingTime += waitingTime[shortest];
-                completed[shortest] = true;
-            }
+            DecimalFormat df = new DecimalFormat("#.##");
+            System.out.println("\nTotal Turnaround Time= " + sum_tat);
+            System.out.println("Average Turnaround time= " + df.format((float) sum_tat / n));
+            System.out.println("Total Waiting Time= " + sum_wt);
+            System.out.println("Average Waiting Time= " + df.format((float) sum_wt / n));
 
-            currentTime++;
         }
-        int chartLength = ganttChart.length();
-        upperLine.setLength(chartLength);
-        lowerLine.setLength(chartLength);
-        System.out.println(upperLine);
-        System.out.println(ganttChart.toString());
-        System.out.println(lowerLine);
+        ;
 
-        
-
-
-        
-        System.out.println();
-
-        System.out.println("\nProcess Details:");
-        System.out.println(
-                "+----------+------------------+------------------+------------------+------------------+------------------+");
-
-        System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n", "Process", "Arrival Time",
-                "Burst Time", "Finish Time", "Turnaround Time", "Waiting Time");
-        System.out.println(
-                "+----------+------------------+------------------+------------------+------------------+------------------+");
-
-        for (int i = 0; i < numProcesses; i++) {
-            int finishTime = arrivalTime[i] + turnaroundTime[i];
-            System.out.printf("| %-8s | %-16s | %-16s | %-16s | %-16s | %-16s |\n",
-                    "P" + i, arrivalTime[i], burstTime[i], finishTime, turnaroundTime[i], waitingTime[i]);
-        }
-
-        System.out.println(
-                "+----------+------------------+------------------+------------------+------------------+------------------+");
-
-        double avgTurnaroundTime = (double) totalTurnaroundTime / numProcesses;
-        double avgWaitingTime = (double) totalWaitingTime / numProcesses;
-        DecimalFormat df = new DecimalFormat("#.##");
-
-        System.out.println("\nTotal Turnaround Time: " + totalTurnaroundTime);
-        System.out.println("Average Turnaround Time: " + df.format(avgTurnaroundTime));
-        System.out.println("Total Waiting Time: " + totalWaitingTime);
-        System.out.println("Average Waiting Time: " + df.format(avgWaitingTime));
-    }
     }
 }
