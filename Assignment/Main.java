@@ -1,32 +1,74 @@
-import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class Main {
+    private static JFrame mainFrame;
+
     public static void main(String[] args) {
-       
-         Scanner input = new Scanner(System.in);
-        int type = 0;
-         do {
-            System.out.print("Please select mode: \n" +
-                                "1. NonPreemptiveSJF\n" +
-                                "2. PreemptiveSJF\n" +
-                                "3. NonPreemptivePriority\n" +
-                                "4. RoundRobin\n\n" +
-                                "Input (0 to quit) -> ");
+        SwingUtilities.invokeLater(() -> {
+            mainFrame = new JFrame("Scheduling Algorithms");
+            mainFrame.setSize(400, 200);
+            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.setLayout(new GridLayout(2, 2, 10, 10));
+            mainFrame.getContentPane().setBackground(Color.lightGray);
 
-            try {
-                type = input.nextInt();
-            } catch (Exception e) {
-                System.out.println("\nError: Input is not an integer\n\n");
+            JButton btnNonPreemptiveSJF = createButton("Non-Preemptive SJF");
+            JButton btnPreemptiveSJF = createButton("Preemptive SJF");
+            JButton btnNonPreemptivePriority = createButton("Non-Preemptive Priority");
+            JButton btnRoundRobin = createButton("Round Robin");
+
+            mainFrame.add(btnNonPreemptiveSJF);
+            mainFrame.add(btnPreemptiveSJF);
+            mainFrame.add(btnNonPreemptivePriority);
+            mainFrame.add(btnRoundRobin);
+
+            mainFrame.setVisible(true);
+        });
+    }
+
+    private static JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.PLAIN, 16));
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.white);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleButtonClick(text);
             }
-             if (type == 0) System.exit(0);
-            else if (!(type == 1 || type == 2 || type ==3 || type == 4)) System.out.println("\nPlease choose the correct option\n\n");
-            else break;
-        } while (true);
+        });
+        return button;
+    }
 
-        if (type == 1) new NonPreemptiveSJF();
-        else if (type == 2) new PreemptiveSJF();
-        else if (type == 3) new NonPreemptivePriority();
-        else if (type == 4) new RoundRobin();
+    private static void handleButtonClick(String algorithm) {
+        switch (algorithm) {
+            case "Non-Preemptive SJF":
+                NonPreemptiveSJFGUI window1 = new NonPreemptiveSJFGUI();
+                window1.display1();
+                break;
+            case "Preemptive SJF":
+                PreemptiveSJFGUI window2 = new PreemptiveSJFGUI();
+                window2.display2();
+                break;
+            case "Non-Preemptive Priority":
+                NonPreemptivePriorityGUI window3 = new NonPreemptivePriorityGUI();
+                window3.display3();
+                break;
+            case "Round Robin":
+                RoundRobinGUI window4 = new RoundRobinGUI();
+                window4.display4();
+                break;
+            default:
+                break;
+        }
+    }
 
-        input.close();
+    // Method to display the main homepage
+    public static void displayHomepage() {
+        mainFrame.setVisible(true);
     }
 }
