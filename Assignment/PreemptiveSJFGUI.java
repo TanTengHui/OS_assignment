@@ -134,13 +134,13 @@ public class PreemptiveSJFGUI {
                 int minimum = Integer.MAX_VALUE;
 
                 for (int i = 0; i < n; i++) {
-                    if (pg[i].at <= current_time && !is_completed[i]) {
-                        if (bt_remaining[i] < minimum) {
+                    if (pg[i].at <= current_time && !is_completed[i]) {// Process is available at current time
+                        if (bt_remaining[i] < minimum) { // Find the process with minimum burst time
                             minimum = (int) bt_remaining[i];
                             min_index = i;
                         }
-                        if (bt_remaining[i] == minimum) {
-                            if (pg[i].at < pg[min_index].at) {
+                        if (bt_remaining[i] == minimum) {// If two processes have same burst time, choose the one with smaller arrival time
+                            if (pg[i].at < pg[min_index].at) {// Find the process with minimum arrival time
                                 minimum = (int) bt_remaining[i];
                                 min_index = i;
                             }
@@ -148,20 +148,20 @@ public class PreemptiveSJFGUI {
                     }
                 }
 
-                if (min_index == -1) {
+                if (min_index == -1) {// No process is available at current time
                     current_time++;
                 } else {
-                    if (bt_remaining[min_index] == pg[min_index].bt) {
-                        pg[min_index].start_time = current_time;
+                    if (bt_remaining[min_index] == pg[min_index].bt) {// Process is starting
+                        pg[min_index].start_time = current_time; 
                     }
                     upperLine.append("-".repeat(Math.max(0, pg[min_index].bt))).append("------");
                     ganttChart.append(String.format(" %-" + timeUnitWidth + "s |", "P" + pg[min_index].pid));
                     lowerLine.append("-".repeat(Math.max(0, pg[min_index].bt))).append("------");
 
-                    bt_remaining[min_index] -= 1;
+                    bt_remaining[min_index] -= 1; 
                     current_time++;
 
-                    if (bt_remaining[min_index] == 0) {
+                    if (bt_remaining[min_index] == 0) { // Process is completed
                         pg[min_index].ct = current_time;
                         pg[min_index].tat = pg[min_index].ct - pg[min_index].at;
                         pg[min_index].wt = pg[min_index].tat - pg[min_index].bt;

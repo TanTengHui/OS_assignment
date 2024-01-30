@@ -112,8 +112,8 @@ public class RoundRobinGUI {
     private void executeRoundRobin() {
         try {
             int n, index;
-            Queue<Integer> q = new LinkedList<>();
-            boolean[] visited = new boolean[100];
+            Queue<Integer> q = new LinkedList<>();// queue for ready processes
+            boolean[] visited = new boolean[100];// array to keep track of visited processes
             int current_time = 0, completed = 0, tq;
             DecimalFormat df = new DecimalFormat("#.##");
 
@@ -149,12 +149,12 @@ public class RoundRobinGUI {
             while (completed != n) {
                 index = q.poll();
 
-                if (tasks[index].bt_remaining == tasks[index].burstTime) {
+                if (tasks[index].bt_remaining == tasks[index].burstTime) { // first time execution
                     tasks[index].start_time = Math.max(current_time, tasks[index].arrivalTime);
                     current_time = tasks[index].start_time;
                 }
-
-                if (tasks[index].bt_remaining - tq > 0) {
+                
+                if (tasks[index].bt_remaining - tq > 0) { // process is not completed
                     tasks[index].bt_remaining -= tq;
                     current_time += tq;
                 } else {
@@ -174,16 +174,16 @@ public class RoundRobinGUI {
                 ganttChart.append(String.format(" %-" + timeUnitWidth + "s |", "P" + tasks[index].processID));
                 lowerLine.append("-".repeat(Math.max(0, tasks[index].burstTime))).append("------");
 
-                for (int i = 1; i < n; i++) {
+                for (int i = 1; i < n; i++) {// add processes to queue
                     if (tasks[i].bt_remaining > 0 && tasks[i].arrivalTime <= current_time && !visited[i]) {
                         q.add(i);
                         visited[i] = true;
                     }
                 }
-                if (tasks[index].bt_remaining > 0)
+                if (tasks[index].bt_remaining > 0)// add the current process to the end of the queue
                     q.add(index);
 
-                if (q.isEmpty()) {
+                if (q.isEmpty()) {  // if queue is empty, find the next process to execute
                     for (int i = 1; i < n; i++) {
                         if (tasks[i].bt_remaining > 0) {
                             q.add(i);
@@ -203,7 +203,7 @@ public class RoundRobinGUI {
             ganttChartArea.append(ganttChart + "\n");
             ganttChartArea.append(lowerLine + "\n");
 
-            Arrays.sort(tasks, 0, n, Comparator.comparingInt(p -> p.processID));
+            Arrays.sort(tasks, 0, n, Comparator.comparingInt(p -> p.processID)); // sort by process ID
 
             tableModel.setRowCount(0);
             for (int i = 0; i < n; i++) {

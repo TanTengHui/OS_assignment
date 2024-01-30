@@ -131,16 +131,16 @@ public class NonPreemptiveSJFGUI {
                 int minimum = Integer.MAX_VALUE;
 
                 for (int i = 0; i < n; i++) {
-                    if (ps[i].at <= current_time && ps[i].bt < minimum && ps[i].ct == 0) {
-                        minimum = ps[i].bt;
-                        min_index = i;
+                    if (ps[i].at <= current_time && ps[i].bt < minimum && ps[i].ct == 0) {// Process is available at current time
+                        minimum = ps[i].bt; // Find the process with minimum burst time
+                        min_index = i; // Store the index of the process with minimum burst time
                     }
                 }
 
-                if (min_index == -1) {
+                if (min_index == -1) {// No process is available at current time
                     current_time++;
                 } else {
-
+                    
                     upperLine.append("-".repeat(Math.max(0, ps[min_index].bt))).append("------");
                     ganttChart.append(String.format(" %-" + timeUnitWidth + "s |", "P" + ps[min_index].pid));
                     lowerLine.append("-".repeat(Math.max(0, ps[min_index].bt))).append("------");
@@ -166,7 +166,7 @@ public class NonPreemptiveSJFGUI {
             ganttChartArea.append(ganttChart + "\n");
             ganttChartArea.append(lowerLine + "\n");
 
-            Arrays.sort(ps, (p1, p2) -> Integer.compare(p1.pid, p2.pid));
+            Arrays.sort(ps, (p1, p2) -> Integer.compare(p1.pid, p2.pid)); // Sort by process ID
 
             tableModel.setRowCount(0);
             for (int i = 0; i < n; i++) {

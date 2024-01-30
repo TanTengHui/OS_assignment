@@ -147,7 +147,7 @@ public class NonPreemptivePriorityGUI {
                 pd.add(new Procedure("P" + i, arrivalTime, burstTime, priority));
             }
 
-            pd.sort(Comparator.comparing(Procedure::getArrivalTime).thenComparing(Procedure::getPriority));
+            pd.sort(Comparator.comparing(Procedure::getArrivalTime).thenComparing(Procedure::getPriority)); // Sort by arrival time and priority
 
             int currentTime = 0;
             int totalTurnaroundTime = 0;
@@ -158,9 +158,9 @@ public class NonPreemptivePriorityGUI {
             StringBuilder ganttChart = new StringBuilder("|");
             StringBuilder upperLine = new StringBuilder("-");
             StringBuilder lowerLine = new StringBuilder("-");
-
-            while (!pd.isEmpty() || !readyQueue.isEmpty()) {
-                while (!pd.isEmpty() && pd.get(0).getArrivalTime() <= currentTime) {
+    
+            while (!pd.isEmpty() || !readyQueue.isEmpty()) { // Loop until all processes are completed
+                while (!pd.isEmpty() && pd.get(0).getArrivalTime() <= currentTime) { // Add processes to ready queue
                     readyQueue.add(pd.remove(0));
                     readyQueue.sort(Comparator.comparing(Procedure::getPriority)); // Sort ready queue by priority
                 }
@@ -173,7 +173,7 @@ public class NonPreemptivePriorityGUI {
 
                     totalTurnaroundTime += turnaroundTime;
                     totalWaitingTime += waitingTime;
-
+                    // Add data to table
                     String[] rowData = {
                             currentProcedure.getProcessName(),
                             String.valueOf(currentProcedure.getArrivalTime()),
@@ -210,7 +210,7 @@ public class NonPreemptivePriorityGUI {
 
             // Display procedure details table
             tableModel.setRowCount(0);
-            tableData.sort(Comparator.comparing(row -> Integer.parseInt(row[0].substring(1))));
+            tableData.sort(Comparator.comparing(row -> Integer.parseInt(row[0].substring(1)))); // Sort table by process number
             for (String[] row : tableData) {
                 tableModel.addRow(row);
             }
